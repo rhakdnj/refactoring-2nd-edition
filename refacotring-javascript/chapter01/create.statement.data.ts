@@ -1,5 +1,4 @@
-import { PerformanceCalculator } from './calculator/performance.calculator';
-import { createPerformanceCalculator } from './calculator/calculator.factory';
+import { createPerformanceCalculator, PerformanceCalculator } from './calculator/calculator.factory';
 
 const createStatementData = (invoice: any, plays: any) => {
   const playFor = (performance: any) => plays[performance.playID];
