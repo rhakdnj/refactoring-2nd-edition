@@ -1,44 +1,76 @@
-const createStatementData = (invoice: any, plays: any) => {
-  const playFor = (performance: any) => plays[performance.playID];
-  const amountFor = (performance: any) => {
-    let thisAmount: number = 0;
-    switch (performance.play.type) {
-      case 'tragedy': {
-        thisAmount = 40000;
-        if (performance.audience > 30) {
-          thisAmount += 1000 * (performance.audience - 30);
-        }
-        break;
-      }
-      case 'comedy': {
-        thisAmount = 30000;
-        if (performance.audience > 20) {
-          thisAmount += 10000 + 500 * (performance.audience - 20);
-        }
-        thisAmount += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${performance.play.type}`);
-    }
-    return thisAmount;
-  };
-  const volumeCreditsFor = (performance: any) => {
-    let result: number = 0;
-    result += Math.max(performance.audience - 30, 0);
-    if (performance.play.type === 'comedy') {
-      result += Math.floor(performance.audience / 5);
+class PerformanceCalculator {
+  private _performance: any;
+  private _play: any;
+
+  constructor(performance: any, play: any) {
+    this._performance = performance;
+    this._play = play;
+  }
+
+  public get performance(): any {
+    return this._performance;
+  }
+
+  public get play(): any {
+    return this._play;
+  }
+
+  public get amount(): number {
+    throw new Error('서브클래스 전용 메서드입니다.');
+  }
+
+  public get volumeCredits() {
+    return Math.max(this.performance.audience - 30, 0);
+  }
+}
+
+class TragedyCalculator extends PerformanceCalculator {
+  public get amount(): number {
+    let result: number = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
     }
     return result;
-  };
+  }
+}
+
+class ComedyCalculator extends PerformanceCalculator {
+  public get amount(): number {
+    let result: number = 30000;
+    if (this.performance.audience > 20) {
+      result += 10000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+    return result;
+  }
+
+  public get volumeCredits() {
+    return super.volumeCredits + Math.floor(this.performance.audience / 5);
+  }
+}
+
+const createPerformanceCalculator = (performance: any, play: any) => {
+  switch (play.type) {
+    case 'tragedy':
+      return new TragedyCalculator(performance, play);
+    case 'comedy':
+      return new ComedyCalculator(performance, play);
+    default:
+      return new PerformanceCalculator(performance, play);
+  }
+};
+
+const createStatementData = (invoice: any, plays: any) => {
+  const playFor = (performance: any) => plays[performance.playID];
   const totalAmount = (performances: any) => performances.reduce((total: number, p: any) => total + p.amount, 0);
   const totalVolumeCredits = (performances: any) => performances.reduce((total: number, p: any) => total + p.volumeCredits, 0);
 
   const enrichPerformance = (performance: any) => {
+    const calculator: PerformanceCalculator = createPerformanceCalculator(performance, playFor(performance));
     const result = {...performance};
-    result.play = playFor(result);
-    result.amount = amountFor(result);
-    result.volumeCredits = volumeCreditsFor(result);
+    result.play = calculator.play;
+    result.amount = calculator.amount;
+    result.volumeCredits = calculator.volumeCredits;
     return result;
   };
   const enrichPerformances = invoice.performances.map(enrichPerformance);
