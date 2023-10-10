@@ -67,54 +67,54 @@
 
 ```ts
 const statement = (invoice: any, plays: any) => {
-  let totalAmount: number = 0;
-  let volumeCredits: number = 0;
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`;
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
+    let totalAmount: number = 0;
+    let volumeCredits: number = 0;
+    let result = `청구 내역 (고객명: ${invoice.customer})\n`;
+    const format = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format;
 
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = 0;
+    for (let perf of invoice.performances) {
+        const play = plays[perf.playID];
+        let thisAmount = 0;
 
-    switch (play.type) {
-      case 'tragedy': {
-        thisAmount = 40000;
-        if (perf.audience > 30) {
-          thisAmount += 1000 * (perf.audience - 30);
+        switch (play.type) {
+            case 'tragedy': {
+                thisAmount = 40000;
+                if (perf.audience > 30) {
+                    thisAmount += 1000 * (perf.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                thisAmount = 30000;
+                if (perf.audience > 20) {
+                    thisAmount += 10000 + 500 * (perf.audience - 20);
+                }
+                thisAmount += 300 * perf.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${play.type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        thisAmount = 30000;
-        if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
+
+        // 포인트를 적립한다.
+        volumeCredits += Math.max(perf.audience - 30, 0);
+
+        // comedy 장르는 관객 5명마다 추가 포인트를 제공한다.
+        if (play.type === 'comedy') {
+            volumeCredits += Math.floor(perf.audience / 5);
         }
-        thisAmount += 300 * perf.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${play.type}`);
+
+        // 청구 내역을 출력한다.
+        result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`;
+        totalAmount += thisAmount;
     }
-
-    // 포인트를 적립한다.
-    volumeCredits += Math.max(perf.audience - 30, 0);
-
-    // comedy 장르는 관객 5명마다 추가 포인트를 제공한다.
-    if (play.type === 'comedy') {
-      volumeCredits += Math.floor(perf.audience / 5);
-    }
-
-    // 청구 내역을 출력한다.
-    result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`;
-    totalAmount += thisAmount;
-  }
-  result += `총액: ${format(totalAmount / 100)}\n`;
-  result += `적립 포인트: ${volumeCredits}점\n`;
-  return result;
+    result += `총액: ${format(totalAmount / 100)}\n`;
+    result += `적립 포인트: ${volumeCredits}점\n`;
+    return result;
 };
 
 export default statement;
@@ -199,51 +199,51 @@ export default statement;
 
 ```ts
 const statement = (invoice: any, plays: any) => {
-  let totalAmount: number = 0;
-  let volumeCredits: number = 0;
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`;
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
+    let totalAmount: number = 0;
+    let volumeCredits: number = 0;
+    let result = `청구 내역 (고객명: ${invoice.customer})\n`;
+    const format = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format;
 
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = 0;
+    for (let perf of invoice.performances) {
+        const play = plays[perf.playID];
+        let thisAmount = 0;
 
-    // TODO: switch문을 분리
-    switch (play.type) {
-      case 'tragedy': {
-        thisAmount = 40000;
-        if (perf.audience > 30) {
-          thisAmount += 1000 * (perf.audience - 30);
+        // TODO: switch문을 분리
+        switch (play.type) {
+            case 'tragedy': {
+                thisAmount = 40000;
+                if (perf.audience > 30) {
+                    thisAmount += 1000 * (perf.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                thisAmount = 30000;
+                if (perf.audience > 20) {
+                    thisAmount += 10000 + 500 * (perf.audience - 20);
+                }
+                thisAmount += 300 * perf.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${play.type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        thisAmount = 30000;
-        if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
+
+        volumeCredits += Math.max(perf.audience - 30, 0);
+        if (play.type === 'comedy') {
+            volumeCredits += Math.floor(perf.audience / 5);
         }
-        thisAmount += 300 * perf.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${play.type}`);
-    }
 
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    if (play.type === 'comedy') {
-      volumeCredits += Math.floor(perf.audience / 5);
+        result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`;
+        totalAmount += thisAmount;
     }
-
-    result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`;
-    totalAmount += thisAmount;
-  }
-  result += `총액: ${format(totalAmount / 100)}\n`;
-  result += `적립 포인트: ${volumeCredits}점\n`;
-  return result;
+    result += `총액: ${format(totalAmount / 100)}\n`;
+    result += `적립 포인트: ${volumeCredits}점\n`;
+    return result;
 };
 
 export default statement;
@@ -283,40 +283,40 @@ performance와 play는 값을 참조만 하기에(값을 변경하지 않기에)
 
 ```ts
 const statement = (invoice: any, plays: any) => {
-  const amountFor = (performance: any, play: any) => {
-    let result = 0;
-    switch (play.type) {
-      case 'tragedy': {
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
+    const amountFor = (performance: any, play: any) => {
+        let result = 0;
+        switch (play.type) {
+            case 'tragedy': {
+                result = 40000;
+                if (performance.audience > 30) {
+                    result += 1000 * (performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (performance.audience > 20) {
+                    result += 10000 + 500 * (performance.audience - 20);
+                }
+                result += 300 * performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${play.type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
-        }
-        result += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${play.type}`);
-    }
-    return result;
-  };
+        return result;
+    };
 
-  let totalAmount: number = 0;
-  let volumeCredit: number = 0;
-  // ...
-
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = amountFor(perf, play);
+    let totalAmount: number = 0;
+    let volumeCredit: number = 0;
     // ...
-  }
-  // ...
+
+    for (let perf of invoice.performances) {
+        const play = plays[perf.playID];
+        let thisAmount = amountFor(perf, play);
+        // ...
+    }
+    // ...
 };
 ```
 
@@ -337,6 +337,8 @@ thisAmount의 이름은 result로 변경할 수 있다.
 이번에도 마찬가지로 테스트를 돌려보자.
 
 다음으로 play 매개변수의 이름을 바꿀 차례다. 그런데 이 변수는 좀 다르게 처리해야 한다.
+
+<br/>
 
 ### Play 변수 제거하기
 
@@ -366,44 +368,44 @@ thisAmount의 이름은 result로 변경할 수 있다.
 
 ```ts
 const statement = (invoice: any, plays: any) => {
-  const amountFor = (performance: any) => {
-    let result = 0;
-    switch (playFor(performance).type) { // 질의 함수
-      case 'tragedy': {
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
+    const amountFor = (performance: any) => {
+        let result = 0;
+        switch (playFor(performance).type) { // 질의 함수
+            case 'tragedy': {
+                result = 40000;
+                if (performance.audience > 30) {
+                    result += 1000 * (performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (performance.audience > 20) {
+                    result += 10000 + 500 * (performance.audience - 20);
+                }
+                result += 300 * performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
+        return result;
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    // ...
+    let volumeCredits: number = 0;
+    // ...
+
+
+    for (let perf of invoice.performances) {
+        if (playFor(perf).type === 'comedy') { // 변수 인라인
+            volumeCredits += Math.floor(perf.audience / 5);
         }
-        result += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
+
+        result += `  ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience}석)\n`; // 변수 인라인
+        totalAmount += amountFor(perf);
     }
-    return result;
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  // ...
-  let volumeCredits: number = 0;
-  // ...
-
-
-  for (let perf of invoice.performances) {
-    if (playFor(perf).type === 'comedy') { // 변수 인라인
-      volumeCredits += Math.floor(perf.audience / 5);
-    }
-
-    result += `  ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience}석)\n`; // 변수 인라인
-    totalAmount += amountFor(perf);
-  }
-  // ...
+    // ...
 };
 ```
 
@@ -411,30 +413,32 @@ const statement = (invoice: any, plays: any) => {
 
 ```ts
 const statement = (invoice: any, plays: any) => {
-  const amountFor = (performance: any) => {
+    const amountFor = (performance: any) => {
+        // ...
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    const volumeCreditsFor = (performance: any) => {
+        let result: number = Math.max(performance.audience - 30, 0);
+        if (playFor(perf).type === 'comedy') { // 변수 인라인
+            result += Math.floor(performance.audience / 5);
+        }
+        return result;
+    };
     // ...
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  const volumeCreditsFor = (performance: any) => {
-    let result: number = Math.max(performance.audience - 30, 0);
-    if (playFor(perf).type === 'comedy') { // 변수 인라인
-      result += Math.floor(performance.audience / 5);
+    let volumeCredits: number = 0;
+    // ...
+
+    for (let perf of invoice.performances) {
+        volumeCredits += volumeCreditsFor(performance);
+
+        result += `  ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience}석)\n`; // 변수 인라인
+        totalAmount += amountFor(perf);
     }
-    return result;
-  };
-  // ...
-  let volumeCredits: number = 0;
-  // ...
-
-  for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(performance);
-
-    result += `  ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience}석)\n`; // 변수 인라인
-    totalAmount += amountFor(perf);
-  }
-  // ...
+    // ...
 };
 ```
+
+<br />
 
 ### format 변수 제거하기
 
@@ -450,33 +454,33 @@ const statement = (invoice: any, plays: any) => {
 
 ```ts
 const statement = (invoice: any, plays: any) => {
-  const amountFor = (performance: any) => {
+    const amountFor = (performance: any) => {
+        // ...
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    const volumeCreditsFor = (performance: any) => {
+        // ..
+    };
+    const usd = (number: number) => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format(number / 100);
+
     // ...
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  const volumeCreditsFor = (performance: any) => {
-    // ..
-  };
-  const usd = (number: number) => new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(number / 100);
+    let result: string;
+    let volumeCredits: number = 0;
+    // ...
 
-  // ...
-  let result: string;
-  let volumeCredits: number = 0;
-  // ...
+    for (let perf of invoice.performances) {
+        volumeCredits += volumeCreditsFor(performance);
 
-  for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(performance);
-
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf) / 100)} (${perf.audience}석)\n`; // 변수 인라인
-    totalAmount += amountFor(perf);
-  }
-  result += `총액: ${usd(totalAmount / 100)}\n`;
-  result += `적립 포인트: ${volumeCredits}점\n`;
-  return result;
+        result += `  ${playFor(perf).name}: ${usd(amountFor(perf) / 100)} (${perf.audience}석)\n`; // 변수 인라인
+        totalAmount += amountFor(perf);
+    }
+    result += `총액: ${usd(totalAmount / 100)}\n`;
+    result += `적립 포인트: ${volumeCredits}점\n`;
+    return result;
 };
 ```
 
@@ -492,6 +496,8 @@ const statement = (invoice: any, plays: any) => {
 
 그 다음 인라인 함수로 만들면 된다.
 
+<br />
+
 ### volumeCredits 변수 제거하기
 
 **반복문 쪼개기**, **문장 슬라이드하기**(사용 하는 곳에 변수 선언을 가까이)를 적용해서 volumeCredits 변수를 선언하는 문장과 반복문을 모은다.
@@ -504,62 +510,62 @@ const statement = (invoice: any, plays: any) => {
 
 ```ts
 export const statement = (invoice: any, plays: any) => {
-  const amountFor = (performance: any) => {
-    let result = 0;
-    switch (playFor(performance).type) { // 질의 함수
-      case 'tragedy': {
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
+    const amountFor = (performance: any) => {
+        let result = 0;
+        switch (playFor(performance).type) { // 질의 함수
+            case 'tragedy': {
+                result = 40000;
+                if (performance.audience > 30) {
+                    result += 1000 * (performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (performance.audience > 20) {
+                    result += 10000 + 500 * (performance.audience - 20);
+                }
+                result += 300 * performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
+        return result;
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    const volumeCreditsFor = (performance: any) => {
+        let result = Math.max(performance.audience - 30, 0);
+        if ('comedy' === playFor(performance).type) {
+            result += Math.floor(performance.audience / 5);
         }
-        result += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
+        return result;
+    };
+    const usd = (number: number) => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format(number / 100);
+    const totalVolumeCreditsFor = () => {
+        let result: number = 0; // 기존의 volumeCredits 변수 선언 및 정의 문장 슬라이드 하기
+        for (let perf of invoice.performances) {  // 반복문을 쪼개기
+            result += volumeCreditsFor(perf);
+        }
+        return result;
+    };
+
+    let totalAmount: number = 0;
+    let result: string = `청구 내역 (고객명: ${invoice.customer})\n`;
+    // ...
+
+    for (let perf of invoice.performances) {
+        result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+        totalAmount += amountFor(perf);
     }
+
+    result += `총액: ${usd(totalAmount)}\n`;
+    result += `적립 포인트: ${totalVolumeCreditsFor()}점\n`;
     return result;
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  const volumeCreditsFor = (performance: any) => {
-    let result = Math.max(performance.audience - 30, 0);
-    if ('comedy' === playFor(performance).type) {
-      result += Math.floor(performance.audience / 5);
-    }
-    return result
-  };
-  const usd = (number: number) => new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(number / 100);
-  const totalVolumeCreditsFor = () => {
-    let result: number = 0; // 기존의 volumeCredits 변수 선언 및 정의 문장 슬라이드 하기
-    for (let perf of invoice.performances) {  // 반복문을 쪼개기
-      result += volumeCreditsFor(perf);
-    }
-    return result
-  }
-
-  let totalAmount: number = 0;
-  let result: string = `청구 내역 (고객명: ${invoice.customer})\n`;
-  // ...
-
-  for (let perf of invoice.performances) {
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
-    totalAmount += amountFor(perf);
-  }
-
-  result += `총액: ${usd(totalAmount)}\n`;
-  result += `적립 포인트: ${totalVolumeCreditsFor()}점\n`;
-  return result;
 };
 ```
 
@@ -604,64 +610,64 @@ totalAmount도 똑같은 절차로 제거한다.
 
 ```ts
 export const statement = (invoice: any, plays: any) => {
-  const amountFor = (performance: any) => {
-    let result = 0;
-    switch (playFor(performance).type) { // 질의 함수
-      case 'tragedy': {
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
+    const amountFor = (performance: any) => {
+        let result = 0;
+        switch (playFor(performance).type) { // 질의 함수
+            case 'tragedy': {
+                result = 40000;
+                if (performance.audience > 30) {
+                    result += 1000 * (performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (performance.audience > 20) {
+                    result += 10000 + 500 * (performance.audience - 20);
+                }
+                result += 300 * performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
+        return result;
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    const volumeCreditsFor = (performance: any) => {
+        let result = Math.max(performance.audience - 30, 0);
+        if ('comedy' === playFor(performance).type) {
+            result += Math.floor(performance.audience / 5);
         }
-        result += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
+        return result;
+    };
+    const usd = (number: number) => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format(number / 100);
+    const totalVolumeCreditsFor = () => {
+        let result: number = 0; // 기존의 volumeCredits 변수 선언 및 정의 문장 슬라이드 하기
+        for (let perf of invoice.performances) {  // 반복문을 쪼개기
+            result += volumeCreditsFor(perf);
+        }
+        return result;
+    };
+    const appleSauce = () => { // 함수 추출하기
+        let result: number = 0; // 문장 슬라이딩
+        for (let perf of invoice.performances) { // 반복문 쪼개기
+            result += amountFor(perf);
+        }
+        return result;
+    };
+
+    let result: string = `청구 내역 (고객명: ${invoice.customer})\n`;
+    for (let perf of invoice.performances) {
+        result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
     }
+    result += `총액: ${usd(appleSauce())}\n`; // 변수 인라인
+    result += `적립 포인트: ${totalVolumeCreditsFor()}점\n`;
     return result;
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  const volumeCreditsFor = (performance: any) => {
-    let result = Math.max(performance.audience - 30, 0);
-    if ('comedy' === playFor(performance).type) {
-      result += Math.floor(performance.audience / 5);
-    }
-    return result
-  };
-  const usd = (number: number) => new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(number / 100);
-  const totalVolumeCreditsFor = () => {
-    let result: number = 0; // 기존의 volumeCredits 변수 선언 및 정의 문장 슬라이드 하기
-    for (let perf of invoice.performances) {  // 반복문을 쪼개기
-      result += volumeCreditsFor(perf);
-    }
-    return result
-  }
-  const appleSauce = () => { // 함수 추출하기
-    let result: number = 0; // 문장 슬라이딩
-    for (let perf of invoice.performances) { // 반복문 쪼개기
-      result += amountFor(perf);
-    }
-    return result;
-  }
-  
-  let result: string = `청구 내역 (고객명: ${invoice.customer})\n`;
-  for (let perf of invoice.performances) {
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
-  }
-  result += `총액: ${usd(appleSauce())}\n`; // 변수 인라인
-  result += `적립 포인트: ${totalVolumeCreditsFor()}점\n`;
-  return result;
 };
 ```
 
@@ -715,72 +721,72 @@ statement() 메서드의 경우 7줄 밖에 없다.
 
 ```ts
 export const statement = (invoice: any, plays: any) => {
-  const statementData = {
-    customer: invoice.customer,
-    performances: invoice.performances
-  }
-  return renderPlainText(statementData, plays);
+    const statementData = {
+        customer: invoice.customer,
+        performances: invoice.performances
+    }
+    return renderPlainText(statementData, plays);
 }
 
 export const renderPlainText = (data: any, plays: any) => {
-  const amountFor = (performance: any) => {
-    let result = 0;
-    switch (playFor(performance).type) { // 질의 함수
-      case 'tragedy': {
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
+    const amountFor = (performance: any) => {
+        let result = 0;
+        switch (playFor(performance).type) { // 질의 함수
+            case 'tragedy': {
+                result = 40000;
+                if (performance.audience > 30) {
+                    result += 1000 * (performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (performance.audience > 20) {
+                    result += 10000 + 500 * (performance.audience - 20);
+                }
+                result += 300 * performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
+        return result;
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    const volumeCreditsFor = (performance: any) => {
+        let result = Math.max(performance.audience - 30, 0);
+        if ('comedy' === playFor(performance).type) {
+            result += Math.floor(performance.audience / 5);
         }
-        result += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${playFor(performance).type}`);
+        return result
+    };
+    const usd = (number: number) => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+    }).format(number / 100);
+    const totalVolumeCredits = () => {
+        let result: number = 0; // 기존의 volumeCredits 변수 선언 및 정의 문장 슬라이드 하기
+        for (let perf of data.performances) {  // 반복문을 쪼개기
+            result += volumeCreditsFor(perf);
+        }
+        return result
     }
+    const totalAmount = () => { // 함수 추출하기
+        let result: number = 0; // 문장 슬라이딩
+        for (let perf of data.performances) { // 반복문 쪼개기
+            result += amountFor(perf);
+        }
+        return result;
+    }
+
+    let result: string = `청구 내역 (고객명: ${data.customer})\n`;
+    for (let perf of data.performances) {
+        result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+    }
+    result += `총액: ${usd(totalAmount())}\n`; // 변수 인라인
+    result += `적립 포인트: ${totalVolumeCredits()}점\n`;
     return result;
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  const volumeCreditsFor = (performance: any) => {
-    let result = Math.max(performance.audience - 30, 0);
-    if ('comedy' === playFor(performance).type) {
-      result += Math.floor(performance.audience / 5);
-    }
-    return result
-  };
-  const usd = (number: number) => new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(number / 100);
-  const totalVolumeCredits = () => {
-    let result: number = 0; // 기존의 volumeCredits 변수 선언 및 정의 문장 슬라이드 하기
-    for (let perf of data.performances) {  // 반복문을 쪼개기
-      result += volumeCreditsFor(perf);
-    }
-    return result
-  }
-  const totalAmount = () => { // 함수 추출하기
-    let result: number = 0; // 문장 슬라이딩
-    for (let perf of data.performances) { // 반복문 쪼개기
-      result += amountFor(perf);
-    }
-    return result;
-  }
-  
-  let result: string = `청구 내역 (고객명: ${data.customer})\n`;
-  for (let perf of data.performances) {
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
-  }
-  result += `총액: ${usd(totalAmount())}\n`; // 변수 인라인
-  result += `적립 포인트: ${totalVolumeCredits()}점\n`;
-  return result;
 };
 ```
 
@@ -790,8 +796,6 @@ export const renderPlainText = (data: any, plays: any) => {
 
 가장 먼저 고객 정보로부터 중간 데이터 구조로 옮겨보자.
 
-이 작업도 컴파일-테스트-커밋 하면 된다.
-
 같은 방식으로 공연 정보까지 중간 데이터 구조로 옮긴다면 invoice 객체는 이제 renderPlainText()에서 사라져도 된다.
 
 추가적으로 'statement()에 필요한 데이터 처리'에 해당하는 코드를 모두 별도 함수로 빼낸다.
@@ -799,61 +803,61 @@ export const renderPlainText = (data: any, plays: any) => {
 ```ts
 // createStatementData.ts
 const createStatementData = (invoice: any, plays: any) => {
-  const enrichPerformance = (performance: any) => {
-    const result = {...performance};
-    result.play = playFor(result);
-    result.amount = amountFor(result);
-    result.volumeCredits = volumeCreditsFor(result);
-    return result;
-  };
-  const playFor = (performance: any) => plays[performance.playID];
-  const amountFor = (performance: any) => {
-    let result = 0;
-    switch (performance.play.type) { // 질의 함수
-      case 'tragedy': {
-        result = 40000;
-        if (performance.audience > 30) {
-          result += 1000 * (performance.audience - 30);
+    const enrichPerformance = (performance: any) => {
+        const result = {...performance};
+        result.play = playFor(result);
+        result.amount = amountFor(result);
+        result.volumeCredits = volumeCreditsFor(result);
+        return result;
+    };
+    const playFor = (performance: any) => plays[performance.playID];
+    const amountFor = (performance: any) => {
+        let result = 0;
+        switch (performance.play.type) { // 질의 함수
+            case 'tragedy': {
+                result = 40000;
+                if (performance.audience > 30) {
+                    result += 1000 * (performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (performance.audience > 20) {
+                    result += 10000 + 500 * (performance.audience - 20);
+                }
+                result += 300 * performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${performance.play.type}`);
         }
-        break;
-      }
-      case 'comedy': {
-        result = 30000;
-        if (performance.audience > 20) {
-          result += 10000 + 500 * (performance.audience - 20);
+        return result;
+    };
+    const volumeCreditsFor = (performance: any) => {
+        let result = Math.max(performance.audience - 30, 0);
+        if ('comedy' === performance.play.type) {
+            result += Math.floor(performance.audience / 5);
         }
-        result += 300 * performance.audience;
-        break;
-      }
-      default:
-        throw new Error(`알 수 없는 장르: ${performance.play.type}`);
-    }
-    return result;
-  };
-  const volumeCreditsFor = (performance: any) => {
-    let result = Math.max(performance.audience - 30, 0);
-    if ('comedy' === performance.play.type) {
-      result += Math.floor(performance.audience / 5);
-    }
-    return result;
-  };
+        return result;
+    };
 
-  const totalAmount = (enrichedPerformances: any) =>
-    enrichedPerformances.reduce((total: number, p: any) => total + p.amount, 0);
+    const totalAmount = (enrichedPerformances: any) =>
+        enrichedPerformances.reduce((total: number, p: any) => total + p.amount, 0);
 
-  const totalVolumeCredits = (enrichedPerformances: any) =>
-    enrichedPerformances.reduce((total: number, enrichedPerformance: any) => total + enrichedPerformance.volumeCredits, 0)
+    const totalVolumeCredits = (enrichedPerformances: any) =>
+        enrichedPerformances.reduce((total: number, enrichedPerformance: any) => total + enrichedPerformance.volumeCredits, 0);
 
-  const enrichedPerformances = invoice.performances.map(enrichPerformance);
-  return {
-    customer: invoice.customer,
-    performances: enrichedPerformances,
-    totalAmount: totalAmount(enrichedPerformances),
-    totalVolumeCredits: totalVolumeCredits(enrichedPerformances)
-  }
-}
+    const enrichedPerformances = invoice.performances.map(enrichPerformance);
+    return {
+        customer: invoice.customer,
+        performances: enrichedPerformances,
+        totalAmount: totalAmount(enrichedPerformances),
+        totalVolumeCredits: totalVolumeCredits(enrichedPerformances)
+    };
+};
 
-export default createStatementData
+export default createStatementData;
 ```
 
 ```ts
@@ -861,23 +865,23 @@ export default createStatementData
 import createStatementData from './create.statement.data';
 
 export const statement = (invoice: any, plays: any) => {
-  return renderPlanText(createStatementData(invoice, plays));
+    return renderPlanText(createStatementData(invoice, plays));
 };
 
 const renderPlanText = (data: any) => {
-  let result: string = `청구 내역 (고객명: ${data.customer})\n`;
-  for (let perf of data.performances) {
-    result += `  ${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
-  }
-  result += `총액: ${usd(data.totalAmount)}\n`; // 변수 인라인
-  result += `적립 포인트: ${data.totalVolumeCredits}점\n`;
-  return result;
+    let result: string = `청구 내역 (고객명: ${data.customer})\n`;
+    for (let perf of data.performances) {
+        result += `  ${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
+    }
+    result += `총액: ${usd(data.totalAmount)}\n`; // 변수 인라인
+    result += `적립 포인트: ${data.totalVolumeCredits}점\n`;
+    return result;
 };
 
 const usd = (number: number) => new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  minimumFractionDigits: 2,
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
 }).format(number / 100);
 ```
 
@@ -888,23 +892,23 @@ const usd = (number: number) => new Intl.NumberFormat('en-US', {
 import createStatementData from './create.statement.data';
 
 export const htmlStatement = (invoice: any, plays: any) => {
-  return renderHtml(createStatementData(invoice, plays));
+    return renderHtml(createStatementData(invoice, plays));
 };
 
 const renderHtml = (data: any) => {
-  let result: string = `
+    let result: string = `
 <h1>청구 내역 (고객명: ${data.customer})</h1>
 <table>
   <tr><th>연극</th><th>좌석수</th><th>금액</th></tr>
 `;
-  for (let perf of data.performances) {
-    result += `<tr><td>${perf.play.name}</td><td>(${perf.audience}석)</td><td>${usd(perf.amount)}</td></tr>`;
-  }
-  result += `</table>
+    for (let perf of data.performances) {
+        result += `<tr><td>${perf.play.name}</td><td>(${perf.audience}석)</td><td>${usd(perf.amount)}</td></tr>`;
+    }
+    result += `</table>
 <p>총액: <em>${usd(data.totalAmount)}</em></p>
 <p>적립 포인트: <em>${data.totalVolumeCredits}점</em></p>
 `;
-  return result;
+    return result;
 };
 ```
 
@@ -912,7 +916,7 @@ const renderHtml = (data: any) => {
 
 ## 1.7 중간 점검: 두 파일(과 두 단계)로 분리됨
 
-처음보다 코드량이 부쩍 늘었다. 추가된 코드 덕분에 전체 로직을 구성하는 요소 각각이 더 뚜렷이 부각되고, 
+처음보다 코드량이 부쩍 늘었다. 추가된 코드 덕분에 전체 로직을 구성하는 요소 각각이 더 뚜렷이 부각되고,
 
 계산하는 부분과 출력 형식을 다루는 부분이 분리됐다.
 
@@ -924,3 +928,226 @@ const renderHtml = (data: any) => {
 
 `항시 코드 베이스를 작업 시작 전보다 건강하게 만들어놓고 떠나야 한다.`
 
+<br />
+
+## 1.8 다형성을 활용해 계산 코드 재구성하기
+
+이번에는 연극 장르를 추가하고 장르마다 공연료와 적립 포인트 계산법을 다르게 저장하도록 기능을 수정해 보자.
+
+현재 상태에서 코드를 변경하려면 이 계산을 수행하는 함수에서 조건문을 수정해야 한다.
+
+amountFor메서드를 보면 연극 장르에 따라 계산 방법이 달라진다는 사실을 알 수 있는데,
+
+이런 형태의 조건부 로직은 코드 수정 횟수가 늘어날수록 골칫거리고, 전락하기 쉽다.
+
+이를 방지하려면 프로그래밍 언어가 제공하는 구조적인 요소로 보완해야 한다.
+
+조건부 로직을 명확한 구조로 보완하는 방법은 다양하다.
+
+여기서는 객체지향 핵심 특성인 다형성을 활용하도록 하겠다.
+
+이번 작업의 목표는 상속 계층을 구성해서 희극 서브 클래스와 비극 서브 클래스가 각자의 구체적인 계산 로직을 정의하도록 해서 해결하겠다.
+
+희극이나 비극이냐에 따라 정확한 계산 로직을 연결하는 작업은 언어 차원에서 지원받도록 한다.
+
+적립 포인트도 비슷한 구조로 만들 것이다. 이 과정에서 몇 가지 리팩토링 기법을 사용하는데, 그중 핵심은 조건부 로직을 다형성으로 바꾸는 것이다.
+
+이 리팩토링 기법을 사용하려면 상속 계층부터 정의해야 한다. 즉 공연료와 적립 포인트 계산 함수를 담을 클래스가 필요하다.
+
+<br/>
+
+### 공연료 계산기 만들기
+
+여기서는 공연료를 계산하는 amountFor() 함수를 공연마다 자기가 공연료를 계산하는 PerformanceCalculator를 만들어서 거기에 옮기는 작업부터 하겠다.
+
+조건마다 구현이 약간씩 다른 경우에 클래스와 상속을 이용한 코드로 리팩토링을 진행하자.
+
+여기서는 함수를 클래스로 옮기는 함수 옮기기 기법을 사용한다.
+
+```ts
+class PerformanceCalculator {
+    private readonly _performance: any;
+    private readonly _play: any;
+
+    constructor(performance: any, play: any) {
+        this._performance = performance;
+        this._play = play;
+    }
+
+    public get amount(): number {
+        let result: number = 0;
+        switch (this._play.type) {
+            case 'tragedy': {
+                result = 40000;
+                if (this._performance.audience > 30) {
+                    result += 1000 * (this._performance.audience - 30);
+                }
+                break;
+            }
+            case 'comedy': {
+                result = 30000;
+                if (this._performance.audience > 20) {
+                    result += 10000 + 500 * (this._performance.audience - 20);
+                }
+                result += 300 * this._performance.audience;
+                break;
+            }
+            default:
+                throw new Error(`알 수 없는 장르: ${this._play.type}`);
+        }
+        return result;
+    }
+}
+```
+
+그 다음 적립 포인트를 계산하는 volumeCreditFor 메소드도 PerformanceCalculator 클래스로 옮긴다.
+
+<br/>
+
+### 추가적으로 공연료 계산기 다향성 버전으로 만들기
+
+먼저 타입 코드 대신 서브클래스를 사용하도록 변경해야 한다. 이는 **타입 코드를 서브 클래스로 바꾸기** 기법이 사용한다.
+
+이렇게 하려면 PerformanceCalculator의 서브 클래스들을 준비하고 그 중에서 적합한 서브 클래스를 사용하게 만들어야 한다.
+
+이를 위해 PlayType 에 맞게 적절한 Calculator를 생성해주는 createPerformanceCalculator를 만들고 이를 사용하도록 했다.
+
+> calculatorFactory.ts
+
+```ts
+export const createPerformanceCalculator = (performance: any, play: any) => {
+    switch (play.type) {
+        case 'tragedy':
+            return new TragedyCalculator(performance, play);
+        case 'comedy':
+            return new ComedyCalculator(performance, play);
+        default:
+            return new PerformanceCalculator(performance, play);
+    }
+};
+
+export class PerformanceCalculator {
+    private _performance: any;
+    private _play: any;
+
+    constructor(performance: any, play: any) {
+        this._performance = performance;
+        this._play = play;
+    }
+
+    public get performance(): any {
+        return this._performance;
+    }
+
+    public get play(): any {
+        return this._play;
+    }
+
+    public get amount(): number {
+        throw new Error('서브클래스 전용 메서드입니다.');
+    }
+
+    public get volumeCredits() {
+        return Math.max(this.performance.audience - 30, 0);
+    }
+}
+
+class TragedyCalculator extends PerformanceCalculator {
+    public get amount(): number {
+        let result: number = 40000;
+        if (this.performance.audience > 30) {
+            result += 1000 * (this.performance.audience - 30);
+        }
+        return result;
+    }
+}
+
+
+class ComedyCalculator extends PerformanceCalculator {
+    public get amount(): number {
+        let result: number = 30000;
+        if (this.performance.audience > 20) {
+            result += 10000 + 500 * (this.performance.audience - 20);
+        }
+        result += 300 * this.performance.audience;
+        return result;
+    }
+
+    public get volumeCredits() {
+        return super.volumeCredits + Math.floor(this.performance.audience / 5);
+    }
+}
+
+```
+
+> createStatementData.ts
+
+```ts
+import { createPerformanceCalculator, PerformanceCalculator } from './calculator/calculator.factory';
+
+const createStatementData = (invoice: any, plays: any) => {
+    const playFor = (performance: any) => plays[performance.playID];
+    const totalAmount = (performances: any) => performances.reduce((total: number, p: any) => total + p.amount, 0);
+    const totalVolumeCredits = (performances: any) => performances.reduce((total: number, p: any) => total + p.volumeCredits, 0);
+
+    const enrichPerformance = (performance: any) => {
+        const calculator: PerformanceCalculator = createPerformanceCalculator(performance, playFor(performance));
+        const result = {...performance};
+        result.play = calculator.play;
+        result.amount = calculator.amount;
+        result.volumeCredits = calculator.volumeCredits;
+        return result;
+    };
+    const enrichPerformances = invoice.performances.map(enrichPerformance);
+    return {
+        customer: invoice.customer,
+        performances: enrichPerformances,
+        totalAmount: totalAmount(enrichPerformances),
+        totalVolumeCredits: totalVolumeCredits(enrichPerformances)
+    };
+};
+
+export default createStatementData;
+```
+
+<br />
+
+## 1.10 마치며
+
+간단한 예였지만 리팩토링이 무엇인지 감을 잡았길 바란다.
+
+**함수 추출하기**
+
+**변수 인라인하기**
+
+**함수 옮기기**
+
+**조건부 로직을 다형성으로 바꾸기**를 비롯한 다양한 리팩토링 기법을 선보였다.
+
+먼저 원본 함수를 중첩 함수 여러 개로 나눴다. (코드 구조를 분리한 단계로 가장 기본적인 단계의 리팩토링을 말한다.)
+
+다음으로 **단계 쪼개기**(출력에 필요한 데이터 생성, 출력 메서드 쪼개기) 를 사용해서 각 기능별로 모듈화해서 중복을 제거했다.
+
+마지막으로 계산 로직을 다형성으로 표시했다. 각 단계에서 코드 구조를 보강했고 코드가 무슨 일을 하는지보다 더 명확해졌다.
+
+**좋은 코드를 가늠하는 확실한 방법은 '얼마나 수정하기 쉬운가?'이다.**
+
+이 책은 코드를 개선하는 방법을 다룬다.
+
+그런데 프로그래머 사이에서 어떤 코드가 좋은 코드인가에 대한 의견은 분분하다.
+
+내가 선호하는 **적절한 이름의 작은 함수들**로 만드는 방식에 대해 반대하는 사람도 분명히 있을 것이다.
+
+미적인 관점으로 접근하면 좋고 나쁨을 넘어서 명확하지 않다. 어떠한 지침도 세울 수 없다.
+
+하지만 '수정하기 쉬운 코드'는 분명히 좋은 코드의 관점을 제공해 준다.
+
+코드는 명확해야 한다. 코드를 수정해야 할 상황이 오면 고쳐야 할 곳을 쉽게 찾을 수 있고 오류 없이 빠르게 수정할 수 있어야 한다.
+
+건강한 코드 베이스는 생산성을 극대화하고, 고객에게 필요한 기능을 더 빠르게 저렴한 비용으로 제공하도록 해준다.
+
+이번 예시를 통해 배울 수 있는 가장 중요한 것은 바로 리팩토링의 리듬이다.
+
+사람들에게 내가 리팩토링하는 과정을 보여줄 때마다 각 단계를 굉장히 잘게 나누고 매번 컴파일하고 테스트하여 작동하는 상태로 유지한다는 사실에 놀란다.
+
+리팩토링을 효과적으로 하는 핵심은, 단계를 잘게 나눠야 더 빠르게 처리할 수 있고, 코드는 절대 깨지지 않으며 이러한 작은 단계들이 모여서 상당히 큰 변화를 이룰 수 있다는 사실을 깨닫는 것이다.
