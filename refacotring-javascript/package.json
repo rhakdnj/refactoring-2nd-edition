@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run build:live",
     "build": "tsc -p .",
-    "build:live": "nodemon --watch '**/*.ts' --exec 'ts-node' **/main.ts",
+    "build:live": "nodemon --watch '**/*.ts' --exec 'ts-node'",
     "test": "jest"
   },
   "devDependencies": {
