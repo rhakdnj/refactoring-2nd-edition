@@ -4,8 +4,8 @@ export default class Province {
     private readonly _name: string;
     private readonly _producers: Producer[];
     private _totalProduction: number;
-    private _demand;
-    private _price;
+    private _demand: number;
+    private _price: number;
 
     constructor(doc: any) {
         this._name = doc.name;
@@ -21,15 +21,15 @@ export default class Province {
         this._totalProduction += producer.production;
     }
 
-    public get name() {
+    public get name(): string {
         return this._name;
     }
 
-    public get producers() {
+    public get producers(): Producer[] {
         return this._producers;
     }
 
-    public get totalProduction() {
+    public get totalProduction(): number {
         return this._totalProduction;
     }
 
@@ -37,7 +37,7 @@ export default class Province {
         this._totalProduction = totalProduction;
     }
 
-    public get demand() {
+    public get demand(): number {
         return this._demand;
     }
 
@@ -45,7 +45,7 @@ export default class Province {
         this._demand = parseInt(demand);
     }
 
-    public get price() {
+    public get price(): number {
         return this._price;
     }
 
@@ -53,24 +53,24 @@ export default class Province {
         this._price = parseInt(price);
     }
 
-    public get shortfall() {
+    public get shortfall(): number {
         return this._demand - this._totalProduction;
     }
 
-    public get profit() {
+    public get profit(): number {
         return this.demandValue - this.demandCost;
     }
 
-    public get demandValue() {
+    public get demandValue(): number {
         return this.satisfiedDemand * this._price;
     }
 
-    public get satisfiedDemand() {
+    public get satisfiedDemand(): number {
         return Math.min(this._demand, this._totalProduction);
     }
 
     public get demandCost(): number {
-        let remainingDemand = this._demand
+        let remainingDemand = this._demand;
         let result = 0;
         this._producers
             .sort((a, b) => a.cost - b.cost)
@@ -78,7 +78,7 @@ export default class Province {
                 const contribution = Math.min(remainingDemand, p.production);
                 remainingDemand -= contribution;
                 result += contribution * p.cost;
-            })
+            });
         return result;
     }
 }
