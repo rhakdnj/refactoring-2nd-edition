@@ -1,11 +1,15 @@
 import {LocalDateTime} from '@js-joda/core';
 
+const printBanner = (): void => {
+    console.log('********************');
+    console.log('***** 고객채무 *****');
+    console.log('********************');
+};
+
 const printOwing = (invoice: any) => {
     let outstanding = 0;
 
-    console.log('*******************');
-    console.log('***** 고객채무 *****');
-    console.log('*******************');
+    printBanner();
 
     for (const order of invoice.orders) {
         outstanding += order.amount;
