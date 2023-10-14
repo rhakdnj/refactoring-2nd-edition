@@ -1,5 +1,12 @@
 import {LocalDateTime} from '@js-joda/core';
 
+const printOwing = (invoice: any) => {
+    printBanner();
+    const outstanding = calculateOutstanding(invoice);
+    recordDueDate(invoice);
+    printDetails(invoice, outstanding);
+};
+
 const printBanner = (): void => {
     console.log('********************');
     console.log('***** 고객채무 *****');
@@ -12,19 +19,11 @@ const printDetails = (invoice: any, outstanding: number) => {
     console.log(`마감일: ${invoice.dueDate?.toLocaleString()}`);
 };
 
-const printOwing = (invoice: any) => {
-    let outstanding = 0;
+const calculateOutstanding = (invoice: any) => invoice.orders.reduce((outstanding: number, order: any) => outstanding + order.amount, 0);
 
-    printBanner();
-
-    for (const order of invoice.orders) {
-        outstanding += order.amount;
-    }
-
+const recordDueDate = (invoice: any) => {
     const today: LocalDateTime = LocalDateTime.now();
     invoice.dueDate = today.plusDays(30);
-
-    printDetails(invoice, outstanding);
 };
 
 printOwing({
