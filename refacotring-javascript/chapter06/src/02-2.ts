@@ -1,10 +1,7 @@
-const gatherCustomerData = (out: any[], customer: any) => {
-    out.push(['name', customer.name])
-    out.push(['location', customer.location])
-}
 const reportLines = (customer: any) => {
     const lines: any[] = []
-    gatherCustomerData(lines, customer)
+    lines.push(['name', customer.name])
+    lines.push(['location', customer.location])
     return lines
 }
 
