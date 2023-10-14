@@ -1,5 +1,4 @@
-import Province from './province';
-import * as assert from 'assert';
+import Province from '../src/province';
 
 const sampleProvinceData = () => ({
     name: 'Asia',
