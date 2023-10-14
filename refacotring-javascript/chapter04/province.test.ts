@@ -13,13 +13,16 @@ const sampleProvinceData = () => ({
 });
 
 describe('Province', () => {
+    let asia: Province;
+    beforeEach(() => {
+        asia = new Province(sampleProvinceData());
+    })
+
     it('[성공] shortfall should be 5', () => {
-        const asia = new Province(sampleProvinceData());
         expect(asia.shortfall).toBe(5);
     });
 
     it('[성공] profit should be 230', () => {
-        const asia = new Province(sampleProvinceData());
         expect(asia.profit).toBe(230);
     });
 });
