@@ -1,4 +1,4 @@
-const someCustomers = [
+const someCustomers: any = [
     {
         name: 'joy',
         address: {state: 'MA'},
@@ -29,10 +29,10 @@ const someCustomers = [
     },
 ];
 
-const inNewEngland = (customer: any) => {
-    return ['MA', 'CT', 'ME', 'VT', 'NH', 'RI'].includes(customer.address.state);
-};
+function inNewEngland(stateCode: any) {
+    return ['MA', 'CT', 'ME', 'VT', 'NH', 'RI'].includes(stateCode);
+}
 
-const newEnglanders = someCustomers.filter(c => inNewEngland(c));
+const newEnglanders: any = someCustomers.filter((c: any) => inNewEngland(c.address.state));
 
 console.log(newEnglanders);
