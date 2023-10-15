@@ -67,12 +67,8 @@ describe('when: no producers', () => {
 });
 
 describe('when: producers is string not array', () => {
-    let notArrayProducers: Province;
-    beforeEach(() =>
-        notArrayProducers = new Province({name: 'Asia', producers: "", demand: 30, price: 20,})
-    );
-
-    it('[Edge Case] given: nothing, when: no producers, then: shortfall should be 30', () => {
-        expect(notArrayProducers.shortfall).toBe(0);
+    it('[Edge Case] given: nothing, when: producers is string not array, then: throw error', () => {
+        expect( () => new Province({name: 'Asia', producers: '', demand: 30, price: 20,}))
+            .toThrowError()
     });
 });

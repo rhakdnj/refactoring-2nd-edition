@@ -22,7 +22,7 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.ts$": "ts-jest"
+      "^.+\\.ts$": ["ts-jest"]
     },
     "testRegex": "\\.test\\.ts$",
     "moduleFileExtensions": [
@@ -30,11 +30,6 @@
       "tsx",
       "js",
       "json"
-    ],
-    "globals": {
-      "ts-jest": {
-        "diagnostics": true
-      }
-    }
+    ]
   }
 }
