@@ -13,7 +13,20 @@ const operatingPlan = {
     temperatureCeiling: 56,
 };
 
-const readingsOutsideRange = (station: any, min: number, max: number) =>
-    station.readings.filter((r: any) => r.temp < min || r.temp > max);
+class NumberRange {
+    constructor(
+        private readonly _min: number,
+        private readonly _max: number,
+    ) {
+    }
 
-console.log(readingsOutsideRange(station, operatingPlan.temperatureFloor, operatingPlan.temperatureCeiling));
+    contains(number: number) {
+        return (number >= this._min && number <= this._max);
+    }
+}
+
+const range = new NumberRange(operatingPlan.temperatureFloor, operatingPlan.temperatureCeiling);
+const readingsOutsideRange = (station: any, range: NumberRange) =>
+    station.readings.filter((r: any) => !range.contains(r.temp));
+
+console.log(readingsOutsideRange(station, range));
