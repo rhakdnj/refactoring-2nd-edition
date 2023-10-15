@@ -9,13 +9,23 @@ const shippingMethod: any = {
 };
 
 const priceOrder = (product: any, quantity: any, shippingMethod: any) => {
+    return applyShipping(calculatePriceData(product, quantity), shippingMethod);
+};
+
+const calculatePriceData = (product: any, quantity: any) => {
     const basePrice = product.basePrice * quantity;
     const discount = Math.max(quantity - product.discountThreshold, 0) * product.basePrice * product.discountRate;
-    const shippingPerCase =
-        basePrice > shippingMethod.discountThreshold ? shippingMethod.discountFee : shippingMethod.feePerCase;
-    const shippingCost = quantity * shippingPerCase;
-    const price = basePrice - discount + shippingCost;
-    return price;
+    return {
+        basePrice,
+        quantity,
+        discount
+    };
+};
+
+const applyShipping = (priceData: any, shippingMethod: any) => {
+    const shippingPerCase = priceData.basePrice > shippingMethod.discountThreshold ? shippingMethod.discountFee : shippingMethod.feePerCase;
+    const shippingCost: number = priceData.quantity * shippingPerCase;
+    return priceData.basePrice - priceData.discount + shippingCost;
 };
 
 products.forEach((product: any) => {
