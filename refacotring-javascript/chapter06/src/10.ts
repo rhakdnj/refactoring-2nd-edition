@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const acquireReading = (): any => ({
     customer: 'ivan',
     quantity: 10,
@@ -5,26 +7,32 @@ const acquireReading = (): any => ({
     year: 2017,
 });
 const baseRate = (month: number, year: number) => year - 2000 + month;
+const taxThreshold = (year: number) => (year - 2000) * 0.1;
+
+export const enrichReading = (original: any) => {
+    const result: any = _.cloneDeep(original);
+    result.baseCharge = calculateBaseCharge(result);
+    result.taxableCharge = Math.max(0, result.baseCharge - taxThreshold(result.year));
+    return result;
+};
+
+const calculateBaseCharge = (result: any) => {
+    return baseRate(result.month, result.year) * result.quantity;
+};
 
 const client1 = () => {
-    const reading: any = acquireReading();
-    const baseCharge = baseRate(reading.month, reading.year) * reading.quantity;
-    return baseCharge;
+    const reading: any = enrichReading(acquireReading());
+    return reading.baseCharge;
 };
 
 const client2 = () => {
-    const taxThreshold = (year: number) => (year - 2000) * 0.1;
-    const reading: any = acquireReading();
-    const base: number = baseRate(reading.month, reading.year) * reading.quantity;
-    const taxableCharge: number = Math.max(0, base - taxThreshold(reading.year));
-    return taxableCharge;
+    const reading = enrichReading(acquireReading());
+    return reading.taxableCharge;
 };
 
 const client3 = () => {
-    const reading = acquireReading();
-    const calculateBaseCharge = (reading: any) => baseRate(reading.month, reading.year) * reading.quantity;
-    const basicChargeAmount = calculateBaseCharge(reading);
-    return basicChargeAmount;
+    const reading = enrichReading(acquireReading());
+    return reading.baseCharge;
 };
 
 [client1, client2, client3].forEach(c => console.log(c()));
