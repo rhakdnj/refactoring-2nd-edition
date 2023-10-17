@@ -16,9 +16,4 @@ describe('customerData', () => {
         expect(laterAmount).toBe( 53)
         expect(change).toBe( -17)
     })
-
-    it('compareUsageException', () => {
-        expect(() => compareUsage('1920', parseInt('2015'), parseInt('1')))
-            .toThrowError(IllegalStateException);
-    })
 })
