@@ -1,25 +1,31 @@
 let result = '';
 class Organization {
-    _data;
+    _name;
+    _country;
     constructor(data: any) {
-        this._data = data;
+        this._name = data.name;
+        this._country = data.country;
     }
 
     set name(name: string) {
-        this._data.name = name;
+        this._name = name;
+    }
+
+    set country(country: string) {
+        this._country = country;
     }
 
     get name() {
-        return this._data.name;
+        return this._name;
+    }
+
+    get country() {
+        return this._country;
     }
 }
 const organization = new Organization({name: '애크미 구스베리', country: 'GB'});
 
-const getOrganization = () => {
-    return organization;
-}
-
-getOrganization().name = '애그머니 블루베리';
-result += `<h1>${getOrganization().name}</h1>`;
+organization.name = '애그머니 블루베리';
+result += `<h1>${organization.name}</h1>`;
 
 console.log(result);
