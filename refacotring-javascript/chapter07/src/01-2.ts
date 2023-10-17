@@ -2,36 +2,32 @@ import { readJSON } from '../../file.controller';
 import * as path from 'path';
 import { cloneDeep } from 'lodash';
 
-class CustomerData {
-    _data;
+export class CustomerData {
+    #data;
 
     constructor(data: any) {
-        this._data = data;
+        this.#data = data;
     }
 
     usage(customerId: string, year: number, month: number) {
-        return this._data[customerId].usages[year][month];
+        return this.#data[customerId].usages[year][month];
     }
 
-    setUsage = (customerId: string, year: number, month: number, amount: number) => {
-        getRawDataOfCustomers()[customerId].usages[year][month] = amount;
+    setUsage(customerId: string, year: number, month: number, amount: number)  {
+        const newData = cloneDeep(this.#data)
+        newData[customerId].usages[year][month] = amount;
+        this.#data = newData;
     };
 
     get rawData() {
-        return cloneDeep(this._data);
+        return cloneDeep(this.#data);
     }
 }
 
 let customerData = new CustomerData(readJSON(path.resolve(__dirname, '01-2.json')));
 
-const getCustomerData = () => customerData;
-export const getRawDataOfCustomers = () => customerData.rawData;
-const setRawDataOfCustomers = (data: any) => {
-    customerData = new CustomerData(data);
-};
-
 export const writeData = (customerId: string, year: number, month: number, amount: number) => {
-    getCustomerData().setUsage(customerId, year, month, amount);
+    customerData.setUsage(customerId, year, month, amount);
 };
 
 export const compareUsage = (customerId: string, laterYear: number, month: number) => {
@@ -39,3 +35,4 @@ export const compareUsage = (customerId: string, laterYear: number, month: numbe
     const earlier = customerData.usage(customerId, laterYear - 1, month);
     return {laterAmount: later, change: later - earlier};
 };
+
