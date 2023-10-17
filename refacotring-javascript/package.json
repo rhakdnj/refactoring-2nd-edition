@@ -7,7 +7,7 @@
     "start": "npm run build:live",
     "build": "tsc -p .",
     "build:live": "nodemon --watch '**/*.ts' --exec 'ts-node'",
-    "test": "jest"
+    "test": "nodemon --watch '**/*.ts' --exec 'ts-node' --exec 'jest ${0}'"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",
