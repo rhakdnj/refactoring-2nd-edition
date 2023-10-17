@@ -9,30 +9,33 @@ class CustomerData {
         this._data = data;
     }
 
-    setUsage = (customerId: string, year: string, month: number, amount: number) => {
-        getRawDataOfCustomers()[customerId].usages[year][month] = amount;
+    usage(customerId: string, year: number, month: number) {
+        return this._data[customerId].usages[year][month];
     }
+
+    setUsage = (customerId: string, year: number, month: number, amount: number) => {
+        getRawDataOfCustomers()[customerId].usages[year][month] = amount;
+    };
 
     get rawData() {
         return cloneDeep(this._data);
     }
 }
 
-
 let customerData = new CustomerData(readJSON(path.resolve(__dirname, '01-2.json')));
 
 const getCustomerData = () => customerData;
-export const getRawDataOfCustomers = () => customerData._data;
+export const getRawDataOfCustomers = () => customerData.rawData;
 const setRawDataOfCustomers = (data: any) => {
     customerData = new CustomerData(data);
 };
 
-export const writeData = (customerId: string, year: string, month: number, amount: number) => {
+export const writeData = (customerId: string, year: number, month: number, amount: number) => {
     getCustomerData().setUsage(customerId, year, month, amount);
 };
 
 export const compareUsage = (customerId: string, laterYear: number, month: number) => {
-    const later = getRawDataOfCustomers()[customerId].usages[laterYear][month];
-    const earlier = getRawDataOfCustomers()[customerId].usages[laterYear - 1][month];
+    const later = customerData.usage(customerId, laterYear, month);
+    const earlier = customerData.usage(customerId, laterYear - 1, month);
     return {laterAmount: later, change: later - earlier};
 };
