@@ -322,3 +322,42 @@ printOwing({
     ],
 });
 ```
+
+<br/>
+
+## 6.2 함수 인라인하기
+
+### 배경
+함수 자체가 짧은 걸 권장하지만 때로는 함수 본문이 함수 이름만큼 명확한 경우가 있다면 함수를 제거하는 게 좋다.
+
+쓸데없는 간접 호출은 거슬릴 뿐이다.
+
+또 적용할 시점은 리팩토링 과정에서 잘못 추출한 함수들이 있다면 이를 제거하기 위해 인라인 할 수도 있다.
+
+그리고 간접 호출을 너무 과하게 쓰는 경우가 있다면 즉 가령 다른 함수들로 위임만 하는 구조가 있다면 이를 인라인 하기도 한다.
+
+<br/>
+
+### 절차
+1. 다형 메서드인지 확인한다.(서브클래스에서 오버라이드 하는 메서드는 인라인하면 안된다)
+2. 인라인할 함수를 호출하는 곳을 모두 찾아서 교체한다.
+
+<br/>
+
+### 예시
+다음 함수를 살펴보자.
+
+```ts
+const moreThanFiveLateDeliveries = (driver: any): boolean => driver.numberOfLateDeliveries > 5;
+const rating = (driver: any): number => (moreThanFiveLateDeliveries(driver) ? 2 : 1);
+```
+
+호출하는 함수 반환문을 그대로 복사해서 호출하는 함수의 호출문을 덮어쓴다.
+
+하나의 과정을 더 찾아봄을 줄임으로서 더 자명해진다.
+
+```ts
+const rating = (driver: any): number => (driver.numberOfLateDeliveries > 5 ? 2 : 1);
+```
+
+
