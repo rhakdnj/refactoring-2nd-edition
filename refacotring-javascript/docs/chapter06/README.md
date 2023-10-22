@@ -1333,3 +1333,122 @@ const applyShipping = (priceData: any, shippingMethod: any) => {
     return priceData.basePrice - priceData.discount + shippingCost;
 };
 ```
+
+### 예시: 명령줄 프로그램 쪼개기
+
+JSON 파일에 담긴 주문의 개수를 세는 프로그램을 살펴보자.
+
+```ts
+/**
+ * cmd: ts-node chapter06/src/11-2.ts -r chapter06/src/11-products.json
+ */
+import { readJSON } from '../../file.controller';
+
+console.log(process.argv);
+
+class Order {
+    private readonly _product: any;
+
+    constructor(product: any) {
+        this._product = product;
+    }
+
+    public get product(): any {
+        return this._product;
+    }
+}
+
+const main = () => {
+    try {
+        const argv: string[] = process.argv;
+        if (argv.length < 3) {
+            throw new Error('파일명을 입력하세요');
+        }
+        const filename = argv[argv.length - 1];
+        const input = readJSON(filename);
+        const orders = input.map((item: any) => new Order(item));
+
+        if (argv.includes('-r')) {
+            const readyOrders = orders.filter((o: any) => o.product.status === 'ready');
+            console.log('ready', readyOrders.length);
+        } else {
+            console.log('not ready', orders.length);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+main();
+```
+
+위 코드는 두 가지 일을 한다. 하나는 주문 목록을 읽어서 개수를 세고, 다른 하나는 명령줄 인수를 담은 배여을 읽어서 프로그램의 동작을 결정한다.
+
+첫 번째 단계는 명령줄 인수의 구문을 분석해서 의미를 추출한다.
+
+두 번째 단계는 이렇게 추출된 정보를 이용하여 데이터를 적절히 가공한다.
+
+```ts
+/**
+ * cmd: ts-node chapter06/src/11-2.ts -r chapter06/src/11-products.json
+ */
+import { readJSON } from '../../file.controller';
+console.log(process.argv);
+class Order {
+    private readonly _product: any;
+    constructor(product: any) {
+        this._product = product;
+    }
+    public get product(): any {
+        return this._product;
+    }
+}
+
+class CommandLine {
+    private readonly _filename: string;
+    private readonly _onlyCountReady: boolean;
+
+    constructor(args: string[]) {
+        if (args.length < 3) {
+            throw new Error('파일명을 입력하세요');
+        }
+        this._filename = args[args.length - 1];
+        this._onlyCountReady = args.includes('-r');
+    }
+
+    get filename(): string {
+        return this._filename;
+    }
+
+    get onlyCountReady(): boolean {
+        return this._onlyCountReady;
+    }
+}
+
+const run = (args: string[]) => {
+    return countOrders(new CommandLine(args));
+};
+
+const countOrders = (commandLine: CommandLine) => {
+    const input = readJSON(commandLine.filename);
+    const orders = input.map((item: any) => new Order(item));
+
+    if (commandLine.onlyCountReady) {
+        const readyOrders = orders.filter((o: any) => o.product.status === 'ready');
+        return `ready: ${readyOrders.length}`;
+    } else {
+        return `not ready: ${orders.length}`;
+    }
+};
+
+const main = () => {
+    try {
+        console.log(run(process.argv));
+    } catch (err) {
+        console.error(err);
+    }
+};
+main();
+```
+
+핵심은 어디까지나 단계를 명확히 분리하는 데 있기 때문이다.
