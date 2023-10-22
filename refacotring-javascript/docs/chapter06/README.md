@@ -1293,4 +1293,43 @@ const applyShipping = (basePrice: number, shippingMethod, quantity: number, disc
 };
 ```
 
-첫 번째 단계와 두 번째 단계가 주고받을 중간 데이터 구조를 만든다.
+첫 번째 단계(상품 가격, discount)와 두 번째 단계(shippingCost)가 주고받을 중간 데이터 구조를 만든다.
+
+```ts
+const priceOrder = (product: any, quantity: any, shippingMethod: any) => {
+    const basePrice = product.basePrice * quantity;
+    const discount = Math.max(quantity - product.discountThreshold, 0) * product.basePrice * product.discountRate;
+    const priceData = {basePrice, discount, quantity};
+    const price = applyShipping(shippingMethod, quantity);
+    return price;
+};
+
+const applyShipping = (priceData, shippingMethod) => {
+    const shippingPerCase = priceData.basePrice > shippingMethod.discountThreshold ? shippingMethod.discountFee : shippingMethod.feePerCase;
+    const shippingCost: number = priceData.quantity * shippingPerCase;
+    const price = priceData.basePrice - priceData.discount + shippingCost;
+    return price;
+};
+```
+
+이제 첫 번째 단계를 처리하는 함수를 따로빼내자.
+
+근데 가만 보면 첫번 째 `priceData`를 얻는 과정이 '상품 가격', 'discount'를 얻는 과정이다.
+
+```ts
+const priceOrder = (product: any, quantity: any, shippingMethod: any) => {
+    return applyShipping(calculatePriceData(product, quantity), shippingMethod);
+};
+
+const calculatePriceData = (product: any, quantity: any) => {
+    const basePrice = product.basePrice * quantity;
+    const discount = Math.max(quantity - product.discountThreshold, 0) * product.basePrice * product.discountRate;
+    return {basePrice, quantity, discount};
+};
+
+const applyShipping = (priceData: any, shippingMethod: any) => {
+    const shippingPerCase = priceData.basePrice > shippingMethod.discountThreshold ? shippingMethod.discountFee : shippingMethod.feePerCase;
+    const shippingCost: number = priceData.quantity * shippingPerCase;
+    return priceData.basePrice - priceData.discount + shippingCost;
+};
+```
