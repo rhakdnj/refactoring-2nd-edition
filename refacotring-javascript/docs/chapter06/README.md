@@ -1393,12 +1393,16 @@ main();
  * cmd: ts-node chapter06/src/11-2.ts -r chapter06/src/11-products.json
  */
 import { readJSON } from '../../file.controller';
+
 console.log(process.argv);
+
 class Order {
     private readonly _product: any;
+
     constructor(product: any) {
         this._product = product;
     }
+
     public get product(): any {
         return this._product;
     }
@@ -1409,7 +1413,7 @@ class CommandLine {
     private readonly _onlyCountReady: boolean;
 
     constructor(args: string[]) {
-        if (args.length < 3) {
+        if (args.length  === 0) {
             throw new Error('파일명을 입력하세요');
         }
         this._filename = args[args.length - 1];
@@ -1443,7 +1447,7 @@ const countOrders = (commandLine: CommandLine) => {
 
 const main = () => {
     try {
-        console.log(run(process.argv));
+        console.log(run(process.argv.slice(2)));
     } catch (err) {
         console.error(err);
     }
