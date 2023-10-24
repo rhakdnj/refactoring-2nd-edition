@@ -7,7 +7,7 @@ const COURSES = {
 // @ts-ignore
 class Person {
     _name: string = '';
-    _courses: string[] = [];
+    _courses: Course[] = [];
 
     constructor(name: string) {
         this._name = name;
@@ -18,11 +18,22 @@ class Person {
     }
 
     get courses() {
-        return this._courses;
+        return [...this._courses];
     }
 
-    set courses(aList) {
-        this._courses = aList;
+    addCourse(course: Course) {
+        this._courses.push(course);
+    }
+
+    removeCourse(course: Course, onError = () => {
+        throw new RangeError();
+    }) {
+        const index = this._courses.indexOf(course);
+        if (index === -1) {
+            onError();
+        } else {
+            this._courses.splice(index, 1);
+        }
     }
 }
 
@@ -44,21 +55,18 @@ class Course {
     }
 }
 
-const readBasicCourseNames = (filename: any) => Object.values(filename).map((c: any) => c.basic);
+const readBasicCourseNames = (filename: any) => Object.values(filename) // Array of Values
+    .map((c: any) => c.basic);
 
 const clientA = () => {
     const person: any = new Person('파울러');
 
     const numAdvancedCourses = person.courses.filter((c: any) => c.isAdvanced).length;
 
-    const basicCourseNames = readBasicCourseNames(COURSES);
-    person.courses = basicCourseNames.map((name: any) => new Course(name, false));
+    for (const name of readBasicCourseNames(COURSES)) {
+        person.addCourse(new Course(name, false));
+    }
 
     return person;
-
-    //
-    // for(const name of readBasicCourseNames(COURSES)) {
-    //   aPerson.courses.push(new Course(name, false))
-    // }
 };
 console.log(clientA());
