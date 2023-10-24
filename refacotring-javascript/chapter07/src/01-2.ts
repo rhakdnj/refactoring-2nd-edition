@@ -10,13 +10,11 @@ export class CustomerData {
     }
 
     usage(customerId: string, year: number, month: number) {
-        return this.#data[customerId].usages[year][month];
+        return cloneDeep(this.#data)[customerId].usages[year][month];
     }
 
     setUsage(customerId: string, year: number, month: number, amount: number)  {
-        const newData = cloneDeep(this.#data)
-        newData[customerId].usages[year][month] = amount;
-        this.#data = newData;
+        this.#data[customerId].usages[year][month] = amount;
     };
 
     get rawData() {
