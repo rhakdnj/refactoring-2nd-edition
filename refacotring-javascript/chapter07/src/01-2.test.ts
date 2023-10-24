@@ -16,11 +16,11 @@ describe('customerData', () => {
 
     it('writeData', () => {
         customerData.setUsage('1920', 2016, 1, 53)
-        expect(customerData.rawData['1920'].usages['2016']['1']).toBe(53)
+        expect(customerData.rawData[1920].usages[2016][1]).toBe(53)
     })
 
     it('compareUsage', () => {
-        const {laterAmount, change} = compareUsage('1920', parseInt('2016'), parseInt('1'));
+        const {laterAmount, change} = compareUsage('1920', 2016, 1);
         expect(laterAmount).toBe( 50)
         expect(change).toBe( -20)
     })
