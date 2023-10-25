@@ -2,7 +2,7 @@ class Order {
     #priority: Priority;
 
     constructor(data: any) {
-        this.#priority = data.priority;
+        this.#priority = new Priority(data.priority);
     }
 
     get priorityString(): string {
@@ -11,10 +11,6 @@ class Order {
 
     get priority(): Priority {
         return this.#priority;
-    }
-
-    set priority(value: string) {
-        this.#priority = new Priority(value);
     }
 }
 
@@ -25,13 +21,13 @@ class Priority {
         return ['low', 'normal', 'high', 'rush'];
     }
 
-    #value: string;
+    #value: PriorityType;
 
-    constructor(value: string) {
+    constructor(value: PriorityType) {
         this.#value = value;
     }
 
-    toString(): string {
+    toString(): PriorityType {
         return this.#value;
     }
 
@@ -53,10 +49,14 @@ class Priority {
 }
 
 const client1 = () => {
-    const orders: any[] = [{priority: 'high'}, {priority: 'rush'}, {priority: 'low'}, {priority: 'normal'}].map(
+    const orders: Order[] = [{priority: 'high'}, {priority: 'rush'}, {priority: 'low'}, {priority: 'normal'}].map(
         o => new Order(o),
     );
-    const highPriorityCount = orders.filter(o => o.priorityString === 'high' || o.priorityString === 'rush').length;
+
+    const highPriorityCount = orders.filter(
+        o => o.priority.higherThan(new Priority('normal'))
+    ).length;
+
     return highPriorityCount;
 };
 console.log(client1());
