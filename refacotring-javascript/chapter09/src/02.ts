@@ -1,18 +1,18 @@
 class Organization {
-    _name;
+    _title;
     _country;
 
-    constructor(data: { name: string, country: string }) {
-        this._name = data.name;
+    constructor(data: { title: string, country: string }) {
+        this._title = data.title;
         this._country = data.country;
     }
 
-    get name() {
-        return this._name;
+    get title() {
+        return this._title;
     }
 
-    set name(aString) {
-        this._name = aString;
+    set title(aString) {
+        this._title = aString;
     }
 
     get country() {
@@ -24,4 +24,4 @@ class Organization {
     }
 }
 
-const organization: Organization = new Organization({name: '애크미 구스베리', country: 'GB'});
+const organization: Organization = new Organization({title: '애크미 구스베리', country: 'GB'});
