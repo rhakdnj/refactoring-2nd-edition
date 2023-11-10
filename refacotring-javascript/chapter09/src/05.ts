@@ -16,13 +16,26 @@ class Order {
 
     constructor(data: any) {
         this.#number = data.number;
-        this.#customer = new Customer(data.customer);
+        this.#customer = registerCustomer(data.customer);
     }
 
     get customer() {
-        return this.#customer;
+        return findCustomer(this.#customer.id);
     }
 }
 
-const order: Order = new Order({number: 1, customer: 'a'});
+const _repositoryData = {customers: new Map()};
+
+const registerCustomer = (id: string) => {
+    if (!_repositoryData.customers.has(id)) {
+        _repositoryData.customers.set(id, new Customer(id));
+    }
+    return findCustomer(id);
+}
+
+const findCustomer = (id: string): Customer => {
+    return _repositoryData.customers.get(id);
+}
+
+const order: Order = new Order({number: 1, customer: 'id_1'});
 console.log(order.customer.id);
