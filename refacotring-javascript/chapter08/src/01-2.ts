@@ -1,13 +1,13 @@
 class Account {
     daysOverdrawn: number; // 연체일
-    type: any = {isPremium: false};
+    accountType: AccountType;
 
     constructor(daysOverdrawn: number, type: { isPremium: boolean }) {
         this.daysOverdrawn = daysOverdrawn;
-        this.type = type;
+        this.accountType = new AccountType(type.isPremium);
     }
 
-    get bankCharge(): number { // 이자
+    get bankCharge(): number { // 은행 이자 계산
         let result = 4.5;
         if (this.daysOverdrawn > 0) {
             result += this.overdraftCharge;
@@ -15,15 +15,27 @@ class Account {
         return result;
     }
 
-    get overdraftCharge(): number {
-        if (this.type.isPremium) {
+    get overdraftCharge(): number { // 초과 인출 이자 계산
+        return this.accountType.overdraftCharge(this.daysOverdrawn);
+    }
+}
+
+class AccountType {
+    private readonly _isPremium: boolean;
+
+    constructor(isPremium: boolean) {
+        this._isPremium = isPremium;
+    }
+
+    public overdraftCharge(daysOverdrawn: number): number {
+        if (this._isPremium) {
             const baseCharge = 10;
-            if (this.daysOverdrawn <= 7) {
+            if (daysOverdrawn <= 7) {
                 return baseCharge;
             }
-            return baseCharge + (this.daysOverdrawn - 7) * 0.85;
+            return baseCharge + (daysOverdrawn - 7) * 0.85;
         }
-        return this.daysOverdrawn * 1.75;
+        return daysOverdrawn * 1.75;
     }
 }
 
