@@ -22,6 +22,12 @@ class TelephoneNumber {
     set number(arg) {
         this._number = arg;
     }
+
+    equals(other: any) {
+        if (!(other instanceof TelephoneNumber)) return false;
+        return this._areaCode === other._areaCode &&
+            this._number === other._number;
+    }
 }
 
 class Person {
@@ -35,16 +41,16 @@ class Person {
         return this._telephoneNumber.areaCode;
     }
 
-    set officeAreaCode(arg) {
-        this._telephoneNumber.areaCode = arg;
+    set officeAreaCode(areaCode: string) {
+        this._telephoneNumber = new TelephoneNumber(areaCode, this.officeNumber);
     }
 
     get officeNumber() {
         return this._telephoneNumber.number;
     }
 
-    set officeNumber(arg) {
-        this._telephoneNumber.number = arg;
+    set officeNumber(officeNumber) {
+        this._telephoneNumber = new TelephoneNumber(this.officeAreaCode, officeNumber);
     }
 }
 
