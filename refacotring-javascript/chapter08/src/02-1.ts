@@ -2,34 +2,38 @@ import { LocalDate, LocalDateTime } from '@js-joda/core';
 
 class Customer {
     private readonly _name;
-    private _discountRate;
     private readonly _contract;
 
     constructor(name: string, discountRate: number) {
         this._name = name;
-        this._discountRate = discountRate;
-        this._contract = new CustomerContract(LocalDateTime.now());
+        this._contract = new CustomerContract(LocalDateTime.now(), discountRate);
     }
 
     get discountRate() {
-        return this._discountRate;
+        return this._contract.discountRate;
     }
 
     becomePreferred() {
-        this._discountRate += 0.03;
+        this._contract.discountRate += 0.03;
         // do other stuff
-    }
-
-    applyDiscount(amount: any) {
-        return amount.subtract(amount.multiply(this._discountRate));
     }
 }
 
 class CustomerContract {
     _startDate: LocalDateTime;
+    private _discountRate: number;
 
-    constructor(startDate: LocalDateTime) {
+    constructor(startDate: LocalDateTime, discountRate: number) {
         this._startDate = startDate;
+        this._discountRate = discountRate;
+    }
+
+    get discountRate(): number {
+        return this._discountRate;
+    }
+
+    set discountRate(discountRate: number) {
+        this._discountRate = discountRate;
     }
 }
 
