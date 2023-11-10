@@ -1,14 +1,12 @@
 class ProductionPlan {
-    private _production = 0;
     private readonly _adjustments: any = [];
 
     get production() {
-        return this._production;
+        return this._adjustments.reduce((total: number, adjustment: any) => total + adjustment.amount, 0);
     }
 
     applyAdjustment(adjustment: any) {
         this._adjustments.push(adjustment);
-        this._production += adjustment.amount;
     }
 }
 
