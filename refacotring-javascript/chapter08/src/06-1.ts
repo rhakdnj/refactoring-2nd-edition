@@ -20,16 +20,16 @@ const chargeOrder = (charge: any) =>
  * 반복주문에 대한 추가할인액 20
  * result: 810
  */
-const pricingPlan = retrievePricingPlan();
-const order = retrieveOrder();
-const baseCharge = pricingPlan.base;
-let charge;
-const chargePerUnit = pricingPlan.unit;
-const units = order.units;
-let discount;
-charge = baseCharge + units * chargePerUnit;
-let discountableUnits = Math.max(units - pricingPlan.discountThreshold, 0);
-discount = discountableUnits * pricingPlan.discountFactor;
-if (order.isRepeat) discount += 20;
-charge = charge - discount;
-chargeOrder(charge);
+const {
+    base: baseCharge,
+    unit: chargePerUnit,
+    discountThreshold,
+    discountFactor
+} = retrievePricingPlan();
+const {units, isRepeat} = retrieveOrder();
+
+let discountableUnits = Math.max(units - discountThreshold, 0);
+const discount = discountableUnits * discountFactor
+    + (isRepeat ? 20 : 0);
+
+chargeOrder(baseCharge + units * chargePerUnit - discount);
