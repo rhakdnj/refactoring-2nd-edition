@@ -1,29 +1,71 @@
 const feathers = (birds: any) => new Map(birds.map((b: any) => [b.name, feather(b)]));
 const velocities = (birds: any) => new Map(birds.map((b: any) => [b.name, velocity(b)]));
 
-const feather = (bird: any) => {
+class EuropeanSwallow  {
+    constructor() {
+    }
+
+    get feather() {
+        return '보통';
+    }
+
+    get velocity(): number {
+        return 35;
+    }
+}
+
+class AfricanSwallow {
+    _numberOfCoconuts: number;
+
+    constructor(bird: any) {
+        this._numberOfCoconuts = bird.numberOfCoconuts;
+    }
+
+    get feather() {
+        return this._numberOfCoconuts > 2 ? '지침' : '보통';
+    }
+
+    get velocity() {
+        return 40 - 2 * this._numberOfCoconuts;
+    }
+}
+
+class NorwegianBlueParrot {
+    _isNailed: boolean;
+    _voltage: number;
+
+    constructor(bird: any) {
+        this._isNailed = bird.isNailed;
+        this._voltage = bird.voltage;
+    }
+
+    get feather() {
+        return this._voltage > 100 ? '그을림' : '예쁨';
+    }
+
+    get velocity() {
+        return this._isNailed ? 0 : 10 + this._voltage / 10;
+    }
+}
+
+const createBird = (bird: any) => {
     switch (bird.type) {
         case '유럽 제비':
-            return '보통';
+            return new EuropeanSwallow();
         case '아프리카 제비':
-            return bird.numberOfCoconuts > 2 ? '지침' : '보통';
+            return new AfricanSwallow(bird);
         case '노르웨이 파랑 앵무':
-            return bird.voltage > 100 ? '그을림' : '예쁨';
+            return new NorwegianBlueParrot(bird);
         default:
-            return '알수없음';
+            throw new Error('Unknown bird type');
     }
 };
+
+const feather = (bird: any) => {
+    return createBird(bird).feather;
+};
 const velocity = (bird: any) => {
-    switch (bird.type) {
-        case '유럽 제비':
-            return 35;
-        case '아프리카 제비':
-            return 40 - 2 * bird.numberOfCoconuts;
-        case '노르웨이 파랑 앵무':
-            return bird.isNailed ? 0 : 10 + bird.voltage / 10;
-        default:
-            return null;
-    }
+    return createBird(bird).velocity;
 };
 
 const birds = [
