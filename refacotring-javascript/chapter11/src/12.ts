@@ -1,3 +1,20 @@
+class OrderProcessingError extends Error {
+    private readonly _code;
+
+    constructor(errorCode: number) {
+        super(`주문 처리 오류 ${errorCode}`);
+        this._code = errorCode;
+    }
+
+    get name() {
+        return 'OrderProcessingError';
+    }
+
+    get code() {
+        return this._code;
+    }
+}
+
 class ShippingRules {
     constructor(private readonly data: any) {
         this.data = data;
@@ -12,23 +29,27 @@ const countryData = {
 };
 const errorList: any[] = [];
 
-const localShippingRules = (country: string) => {
+const localShippingRules = (country: 'US' | 'CA') => {
     const data = countryData.shippingRules[country];
-    if (data) {
-        return new ShippingRules(data);
-    } else {
-        return -23;
-    }
+    if (data) return new ShippingRules(countryData.shippingRules[country]);
+    throw new OrderProcessingError(-23);
 };
+
 const calculateShippingCosts = (order: any) => {
     // 관련 없는 코드
-    const shippingRules = localShippingRules(order.country);
-    if (shippingRules < 0) return shippingRules; // 오류 전파
+    return localShippingRules(order.country);
     // 관련 없는 코드
 };
 const execute = (order: any) => {
-    const status = calculateShippingCosts(order);
-    if (status < 0) errorList.push({order, errorCode: status});
+    try {
+        calculateShippingCosts(order);
+    } catch (error) {
+        if (error instanceof OrderProcessingError) {
+            errorList.push({order, errorCode: error.code});
+        } else {
+            throw error;
+        }
+    }
 };
 
 execute({country: 'US'});
