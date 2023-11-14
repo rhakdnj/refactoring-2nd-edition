@@ -1,20 +1,23 @@
 export class Party {
+    protected _name: string;
+
+    constructor(name: string) {
+        this._name = name;
+    }
+
+    get name() {
+        return this._name;
+    }
 }
 
 export class Employee extends Party {
-    #name;
     #id;
     #monthlyCost;
 
     constructor(name: string, id: string, monthlyCost: number) {
-        super();
-        this.#name = name;
+        super(name);
         this.#id = id;
         this.#monthlyCost = monthlyCost;
-    }
-
-    get name() {
-        return this.#name;
     }
 
     get monthlyCost() {
@@ -23,17 +26,11 @@ export class Employee extends Party {
 }
 
 export class Department extends Party {
-    #name;
     #staff;
 
     constructor(name: string, staff: Employee[]) {
-        super();
-        this.#name = name;
+        super(name);
         this.#staff = staff;
-    }
-
-    get name() {
-        return this.#name;
     }
 
     get staff() {
