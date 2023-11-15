@@ -1,9 +1,11 @@
 import { LocalDate } from '@js-joda/core';
+import { result } from 'lodash';
 
 
 class Booking10_1 {
     private readonly _show;
     private readonly _date;
+    private _premiumBockingDelegate: PremiumBockingDelegate10_1 | undefined;
 
     constructor(show: any, date: LocalDate) {
         this._show = show;
@@ -19,52 +21,77 @@ class Booking10_1 {
     }
 
     get hasTalkback() {
-        return this.show.hasOwnProperty('talkback') && !this.isPeakDay;
+        return this._premiumBockingDelegate
+            ? this._premiumBockingDelegate.hasTalkback
+            : this.show.hasOwnProperty('talkback') && !this.isPeakDay;
     }
 
-    get basePrice() {
+    get basePrice(): number {
         let result = this.show.price;
         if (this.isPeakDay) result += Math.round(result * 0.15);
-        return result;
+        return this._premiumBockingDelegate
+            ? this._premiumBockingDelegate.extendBasePrice(result)
+            : result;
     }
 
     get isPeakDay() {
         return this.date.isAfter(LocalDate.parse('2023-07-15')) &&
-            this.date.isBefore(LocalDate.parse('2021-07-31'));
+            this.date.isBefore(LocalDate.parse('2023-07-31'));
+    }
+
+    bePremium(extras: any) {
+        this._premiumBockingDelegate = new PremiumBockingDelegate10_1(this, extras);
+    }
+
+    get hasDinner() {
+        return this._premiumBockingDelegate
+            ? this._premiumBockingDelegate.hasDinner
+            : undefined
     }
 }
 
-class PremiumBooking10_1 extends Booking10_1 {
-    _extras;
+class PremiumBockingDelegate10_1 {
+    private _host: Booking10_1;
+    private _extras: any;
 
-    constructor(show: any, date: LocalDate, extras: any) {
-        super(show, date);
+    constructor(host: Booking10_1, extras: any) {
+        this._host = host;
         this._extras = extras;
     }
 
     get hasTalkback() {
-        return this.show.hasOwnProperty('talkback');
+        return this._host.show.hasOwnProperty('talkback');
     }
 
-    get basePrice() {
-        return Math.round(super.basePrice + this._extras.premiumFee);
+    extendBasePrice(basePrice: number) {
+        return Math.round(basePrice + this._extras.premiumFee);
     }
 
     get hasDinner() {
-        return this._extras.hasOwnProperty('dinner') && !this.isPeakDay;
+        return this._extras.hasOwnProperty('dinner') && !this._host.isPeakDay;
     }
 }
 
-const booking: any = new Booking10_1({price: 100, talkback: true}, LocalDate.parse('2023-07-11'));
-const premiumBooking1 = new PremiumBooking10_1(
+const createBooking10_1 = (show: any, date: LocalDate) => new Booking10_1(show, date);
+const createPremiumBooking10_1 = (show: any, date: LocalDate, extras: any) => {
+    const result = new Booking10_1(show, date);
+    result.bePremium(extras);
+    return result;
+};
+
+const booking: Booking10_1 = createBooking10_1(
+    {price: 100, talkback: true},
+    LocalDate.parse('2023-07-11'));
+
+const premiumBooking1: Booking10_1 = createPremiumBooking10_1(
     {price: 100, talkback: true},
     LocalDate.parse('2023-07-13'),
-    {dinner: true, premiumFee: 10,}
-);
-const premiumBooking2 = new PremiumBooking10_1({price: 100}, LocalDate.parse('2021-07-17'), {
-    dinner: true,
-    premiumFee: 10,
-});
+    {dinner: true, premiumFee: 10});
+
+const premiumBooking2: Booking10_1 = createPremiumBooking10_1(
+    {price: 100},
+    LocalDate.parse('2023-07-17'),
+    {dinner: true, premiumFee: 10});
 
 console.log({
     price: booking.basePrice,
