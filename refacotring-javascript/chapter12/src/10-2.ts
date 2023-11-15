@@ -1,10 +1,12 @@
 class Bird10_2 {
     _name;
     _feather;
+    _speciesDelegate;
 
-    constructor(data: { name: string, feather?: string }) {
+    constructor(data: any) {
         this._name = data.name;
         this._feather = data.feather;
+        this._speciesDelegate = this.selectSpeciesDelegate(data);
     }
 
     get name() {
@@ -12,65 +14,85 @@ class Bird10_2 {
     }
 
     get feather() {
-        return this._feather || '보통';
+        return this._speciesDelegate.feather;
+    }
+
+    get airSpeedVelocity(): number | null {
+        return this._speciesDelegate.airSpeedVelocity;
+    }
+
+    private selectSpeciesDelegate(data: any) {
+        switch (data.type) {
+            case 'european':
+                return new EuropeanSwallowDelegate10_2(data, this);
+            case 'african':
+                return new AfricanSwallowDelegate10_2(data, this);
+            case 'norwegian':
+                return new NorwegianBlueParrotDelegate10_2(data, this);
+            default:
+                return new SpeciesDelegate10_2(data, this);
+        }
+    }
+}
+
+class SpeciesDelegate10_2 {
+    protected readonly _bird;
+
+    constructor(data: any, bird: any) {
+        this._bird = bird;
     }
 
     get airSpeedVelocity(): number | null {
         return null;
     }
+
+    get feather() {
+        return this._bird._feather || '보통';
+    }
 }
 
-class EuropeanSwallow10_2 extends Bird10_2 {
-    get airSpeedVelocity(): number {
+class EuropeanSwallowDelegate10_2 extends SpeciesDelegate10_2 {
+    get airSpeedVelocity() {
         return 35;
     }
 }
 
-class AfricanSwallow10_2 extends Bird10_2 {
-    #numberOfCoconuts;
+class AfricanSwallowDelegate10_2 extends SpeciesDelegate10_2 {
+    private readonly _numberOfCoconuts;
 
-    constructor(data: { name: string, feather?: string, numberOfCoconuts: number }) {
-        super(data);
-        this.#numberOfCoconuts = data.numberOfCoconuts;
+    constructor(data: any, bird: any) {
+        super(data, bird);
+        this._numberOfCoconuts = data.numberOfCoconuts;
     }
 
     get airSpeedVelocity() {
-        return 40 - 2 * this.#numberOfCoconuts;
+        return 40 - 2 * this._numberOfCoconuts;
     }
 }
 
-class NorwegianBlueParrot10_2 extends Bird10_2 {
-    #voltage;
-    #isNailed;
+// @ts-ignore
+class NorwegianBlueParrotDelegate10_2 extends SpeciesDelegate10_2 {
+    private readonly _voltage;
+    private readonly _isNailed;
 
-    constructor(data: { name: string, feather?: string, voltage: number, isNailed: boolean }) {
-        super(data);
-        this.#voltage = data.voltage;
-        this.#isNailed = data.isNailed;
+    constructor(data: any, bird: any) {
+        super(data, bird);
+        this._voltage = data.voltage;
+        this._isNailed = data.isNailed;
     }
 
     get feather() {
-        if (this.#voltage > 100) return '그을림';
-        return this._feather || '예쁨';
+        if (this._voltage > 100) return '그을림';
+        return this._bird._feather || '예쁨';
     }
 
     get airSpeedVelocity() {
-        return this.#isNailed ? 0 : 10 + this.#voltage / 10;
+        return this._isNailed ? 0 : 10 + this._voltage / 10;
     }
 }
 
-const createBird10_2 = (data: any) => {
-    switch (data.type) {
-        case 'european':
-            return new EuropeanSwallow10_2(data);
-        case 'african':
-            return new AfricanSwallow10_2(data);
-        case 'norwegian':
-            return new NorwegianBlueParrot10_2(data);
-        default:
-            return new Bird10_2(data);
-    }
-};
+const createBird10_2 = (data: any) => new Bird10_2(data);
+
 const birds10_2: Bird10_2[] = [
     createBird10_2({type: 'european', name: '유제'}),
     createBird10_2({type: 'african', name: '아제1', numberOfCoconuts: 2}),
