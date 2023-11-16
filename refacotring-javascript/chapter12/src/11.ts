@@ -1,11 +1,11 @@
-import { LocalDate, Period } from '@js-joda/core';
+import { ChronoUnit, LocalDate, Period } from '@js-joda/core';
 
 class CatalogItem {
-    _id;
-    _title;
-    _tags;
+    private readonly _id;
+    private readonly _title;
+    private _tags;
 
-    constructor(id: string, title: string, tags: string[]) {
+    constructor(id: string | null, title: string, tags: string[]) {
         this._id = id;
         this._title = title;
         this._tags = tags;
@@ -19,29 +19,41 @@ class CatalogItem {
         return this._title;
     }
 
-    hasTag(arg: string) {
-        return this._tags.includes(arg);
+    hasTag(tag: string) {
+        return this._tags.includes(tag);
     }
 }
 
-class Scroll extends CatalogItem {
-    #lastCleaned;
+class Scroll {
+    private readonly _id: string
+    private _catalogItem: CatalogItem;
+    private _lastCleaned;
 
-    constructor(id: string, title: string, tags: string[], dataLastCleaned: LocalDate) {
-        super(id, title, tags);
-        this.#lastCleaned = dataLastCleaned;
+    constructor(id: string, title: string, tags: string[], lastCleaned: LocalDate) {
+        this._id = id;
+        this._catalogItem = new CatalogItem(null, title, tags);
+        this._lastCleaned = lastCleaned;
+    }
+
+    get id() {
+        return this._id;
+    }
+
+    get title() {
+        return this._catalogItem.title;
+    }
+
+    hasTag(tag: string) {
+        return this._catalogItem.hasTag(tag);
     }
 
     needsCleaning(targetDate: LocalDate) {
-        const threshold = this.hasTag('revered') ? 700 : 1500;
+        const threshold = this._catalogItem.hasTag('revered') ? 700 : 1500;
         return this.daysSinceLastCleaning(targetDate) > threshold;
     }
 
     daysSinceLastCleaning(targetDate: LocalDate) {
-        // TODO: 올바른 계산이 안됨
-        let diff = Period.between(this.#lastCleaned, targetDate);
-        const diffDays = diff.years() * 365 + diff.months() * 30 + diff.days();
-        return diffDays > 0 ? diffDays : Period.between(targetDate, this.#lastCleaned).days();
+        return this._lastCleaned.until(targetDate, ChronoUnit.DAYS);
     }
 }
 
@@ -53,7 +65,7 @@ const data = [
             title: '아이스스피어',
             tags: ['magic', 'revered'],
         },
-        lastCleaned: '2018-11-01',
+        lastCleaned: '2021-11-01',
     },
     {
         id: 'B002',
@@ -62,7 +74,7 @@ const data = [
             title: '파이어볼',
             tags: ['magic'],
         },
-        lastCleaned: '2018-09-01',
+        lastCleaned: '2021-09-01',
     },
     {
         id: 'C003',
@@ -71,7 +83,7 @@ const data = [
             title: '메테오',
             tags: ['magic', 'revered'],
         },
-        lastCleaned: '2020-02-01',
+        lastCleaned: '2021-02-01',
     },
 ];
 const scrolls = data.map(
